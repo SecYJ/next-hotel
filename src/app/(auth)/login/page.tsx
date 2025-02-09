@@ -9,7 +9,7 @@ const LoginPage = () => {
 
 			<div className="flex items-center gap-2">
 				<p className="font-medium text-white">沒有會員嗎？</p>
-				<Link href={ROUTES.REGISTER} className="text-primary-100">
+				<Link href={ROUTES.REGISTER} replace className="text-primary-100">
 					前往註冊
 				</Link>
 			</div>

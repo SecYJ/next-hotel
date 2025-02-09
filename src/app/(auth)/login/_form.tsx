@@ -1,16 +1,15 @@
 "use client";
 
 import AuthInput from "@/components/form/AuthInput";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormItem } from "@/components/ui/form";
 
 import { FormField } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import { LOGIN_SCHEMA, LoginSchema } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { SubmitButton } from "../components/SubmitButton";
+import { LOGIN_SCHEMA, LoginSchema } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const LoginForm = () => {
 	const form = useForm<LoginSchema>({
@@ -34,8 +33,13 @@ const LoginForm = () => {
 					<FormField
 						control={form.control}
 						name="email"
-						render={({ field }) => (
-							<AuthInput placeholder="hello@example.com" onChange={field.onChange} value={field.value}>
+						render={({ field, fieldState }) => (
+							<AuthInput
+								placeholder="hello@example.com"
+								onChange={field.onChange}
+								value={field.value}
+								error={fieldState.error?.message}
+							>
 								電子信箱
 							</AuthInput>
 						)}
@@ -44,8 +48,13 @@ const LoginForm = () => {
 					<FormField
 						control={form.control}
 						name="password"
-						render={({ field }) => (
-							<AuthInput placeholder="請輸入密碼" onChange={field.onChange} value={field.value}>
+						render={({ field, fieldState }) => (
+							<AuthInput
+								placeholder="請輸入密碼"
+								onChange={field.onChange}
+								value={field.value}
+								error={fieldState.error?.message}
+							>
 								密碼
 							</AuthInput>
 						)}
@@ -64,7 +73,7 @@ const LoginForm = () => {
 												checked={field.value}
 												onCheckedChange={field.onChange}
 											/>
-											<Label className="text-white">記住帳號</Label>
+											<label className="text-white">記住帳號</label>
 										</div>
 									</div>
 								</FormItem>
@@ -75,12 +84,7 @@ const LoginForm = () => {
 						</Link>
 					</div>
 
-					<Button
-						type="submit"
-						className="bg-neutral-40 text-neutral-60 h-14 w-full py-4 disabled:opacity-80 disabled:bg-neutral-40"
-					>
-						會員登入
-					</Button>
+					<SubmitButton control={form.control}>會員登入</SubmitButton>
 				</form>
 			</Form>
 		</div>
