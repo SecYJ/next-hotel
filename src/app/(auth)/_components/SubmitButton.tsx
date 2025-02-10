@@ -13,7 +13,10 @@ export const SubmitButton = <T extends FieldValues>({ control, children }: Props
 	return (
 		<Button
 			type="submit"
-			className={cn(isValid ? "bg-primary-100 text-white" : "bg-neutral-40 text-neutral-60", "h-14 w-full py-4")}
+			className={cn(
+				isValid ? "bg-primary-100 text-white" : "bg-neutral-40 text-neutral-60",
+				"h-14 w-full py-4 disabled:opacity-100"
+			)}
 			disabled={!isValid}
 		>
 			{children}

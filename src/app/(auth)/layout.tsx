@@ -1,4 +1,4 @@
-import AuthTitle from "@/app/(auth)/components/AuthTitle";
+import AuthTitle from "@/app/(auth)/_components/AuthTitle";
 import Image from "next/image";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {

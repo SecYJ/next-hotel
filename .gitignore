@@ -41,3 +41,19 @@ yarn-error.log*
 next-env.d.ts
 
 dist/
+
+*.sql
+
+*.db
+drizzle.meta
+drizzle/*.json
+**/migrations/**/*.json
+**/*_snapshot.json
+**/journal.json
+
+**/*_journal.json
+**/migrations/**/_journal.json
+drizzle/**/journal.json
+
+# But keep the schema configuration
+!drizzle.config.json

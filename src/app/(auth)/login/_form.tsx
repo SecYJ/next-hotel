@@ -7,7 +7,7 @@ import { Form, FormItem } from "@/components/ui/form";
 import { FormField } from "@/components/ui/form";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { SubmitButton } from "../components/SubmitButton";
+import { SubmitButton } from "../_components/SubmitButton";
 import { LOGIN_SCHEMA, LoginSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 

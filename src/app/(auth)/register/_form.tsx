@@ -6,7 +6,8 @@ import { Form, FormField } from "@/components/ui/form";
 import { REGISTER_SCHEMA, RegisterSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { SubmitButton } from "../components/SubmitButton";
+import { SubmitButton } from "../_components/SubmitButton";
+import { createUserAction } from "../_actions";
 
 const RegisterForm = () => {
 	const form = useForm<RegisterSchema>({
@@ -22,12 +23,18 @@ const RegisterForm = () => {
 	});
 
 	const onSubmit = async (data: RegisterSchema) => {
-		try {
-			// Handle registration logic here
-			console.log(data);
-		} catch (error) {
-			console.error(error);
-		}
+		const formData = new FormData();
+		Object.entries(data).forEach(([key, value]) => {
+			if (key === "confirmPassword" || key === "agreeTerm") return;
+			if (typeof value === "boolean") {
+				formData.append(key, value ? "1" : "0");
+				return;
+			}
+			formData.append(key, value.toString());
+		});
+
+		const res = await createUserAction(formData);
+		console.log(res);
 	};
 
 	return (
