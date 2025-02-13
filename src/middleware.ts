@@ -1,44 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { validateRequest } from "./lib/session";
+import { getSession } from "./lib/session";
 import ROUTES from "./constants/routes";
+// This function can be marked `async` if using `await` inside
+
+// const PUBLIC_ROUTES = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.HOME] as string[];
 
 export async function middleware(request: NextRequest) {
-	const pathname = request.nextUrl.pathname;
+	const session = await getSession();
 
-	// Public routes that don't require authentication
-	if (
-		pathname.startsWith("/_next") || // Next.js system routes
-		pathname.startsWith("/api") || // API routes
-		pathname.startsWith("/static") || // Static files
-		pathname === ROUTES.LOGIN ||
-		pathname === ROUTES.REGISTER
-	) {
-		return NextResponse.next();
-	}
-
-	const session = await validateRequest(request);
-
-	// If there's no session and we're not on an auth route, redirect to login
-	if (!session) {
-		const url = new URL(ROUTES.LOGIN, request.url);
-		url.searchParams.set("from", pathname);
-		return NextResponse.redirect(url);
+	if (new URL(request.url).pathname === "/login" && session) {
+		return NextResponse.redirect(new URL(ROUTES.HOME, request.url));
 	}
 
 	return NextResponse.next();
 }
 
-// Configure the middleware to run on specific paths
 export const config = {
 	matcher: [
 		/*
-		 * Match all request paths except:
+		 * Match all request paths except for the ones starting with:
+		 * - api (API routes)
 		 * - _next/static (static files)
 		 * - _next/image (image optimization files)
-		 * - favicon.ico (favicon file)
-		 * - public folder
+		 * - favicon.ico, sitemap.xml, robots.txt (metadata files)
 		 */
-		"/((?!_next/static|_next/image|favicon.ico|public/).*)",
+		"/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
 	],
 };

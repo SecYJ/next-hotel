@@ -10,8 +10,11 @@ import { useForm } from "react-hook-form";
 import { SubmitButton } from "../_components/SubmitButton";
 import { LOGIN_SCHEMA, LoginSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import ROUTES from "@/constants/routes";
 
 const LoginForm = () => {
+	const router = useRouter();
 	const form = useForm<LoginSchema>({
 		defaultValues: {
 			email: "",
@@ -23,7 +26,18 @@ const LoginForm = () => {
 
 	const onSubmit = async (data: LoginSchema) => {
 		// Handle login logic here
-		console.log(data);
+		const response = await fetch("/api/login", {
+			method: "POST",
+			body: JSON.stringify(data),
+		});
+
+		const result = (await response.json()) as { success: boolean };
+
+		console.log(result);
+
+		if (result.success) {
+			router.push(ROUTES.HOME);
+		}
 	};
 
 	return (

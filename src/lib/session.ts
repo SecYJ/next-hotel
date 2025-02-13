@@ -1,6 +1,9 @@
+import ROUTES from "@/constants/routes";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
+import "server-only";
 
 const secretKey = process.env.JWT_SECRET_KEY;
 if (!secretKey) {
@@ -10,18 +13,24 @@ if (!secretKey) {
 const key = new TextEncoder().encode(secretKey);
 
 export type SessionData = {
-	id: string;
+	userId: string;
 	email: string;
 };
+
+export async function createToken({ data, expiresAt }: { data: SessionData; expiresAt?: Date }) {
+	const token = await new SignJWT(data)
+		.setProtectedHeader({ alg: "HS256" })
+		.setIssuedAt()
+		.setExpirationTime(expiresAt ?? "7d")
+		.sign(key);
+
+	return token;
+}
 
 export async function createSession(data: SessionData) {
 	const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-	const token = await new SignJWT({ ...data })
-		.setProtectedHeader({ alg: "HS256" })
-		.setIssuedAt()
-		.setExpirationTime(expiresAt)
-		.sign(key);
+	const token = await createToken({ data, expiresAt });
 
 	const cookieStore = await cookies();
 	cookieStore.set("session", token, {
@@ -31,31 +40,16 @@ export async function createSession(data: SessionData) {
 		sameSite: "lax",
 		path: "/",
 	});
-
-	return token;
 }
 
-export async function getSession(): Promise<SessionData | null> {
+export async function getSession() {
 	const cookieStore = await cookies();
 	const session = cookieStore.get("session");
 
 	if (!session?.value) return null;
 
 	try {
-		const { payload } = await jwtVerify(session.value, key);
-		return payload as SessionData;
-	} catch (error) {
-		return null;
-	}
-}
-
-export async function validateRequest(request: NextRequest) {
-	const session = request.cookies.get("session");
-
-	if (!session?.value) return null;
-
-	try {
-		const { payload } = await jwtVerify(session.value, key);
+		const { payload } = await jwtVerify(session.value, key, { algorithms: ["HS256"] });
 		return payload as SessionData;
 	} catch (error) {
 		return null;
@@ -63,8 +57,11 @@ export async function validateRequest(request: NextRequest) {
 }
 
 export async function logout() {
-	const cookieStore = await cookies();
-	cookieStore.set("session", "", {
-		expires: new Date(0),
-	});
+	// const cookieStore = await cookies();
+	// cookieStore.set("session", "", {
+	// 	expires: new Date(0),
+	// });
+	const cookie = await cookies();
+	cookie.delete("session");
+	redirect(ROUTES.LOGIN);
 }

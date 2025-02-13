@@ -5,11 +5,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormField } from "@/components/ui/form";
 import { REGISTER_SCHEMA, RegisterSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { startTransition, useActionState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "../_components/SubmitButton";
-import { createUserAction } from "../_actions";
+import { createUserAction } from "./actions";
 
 const RegisterForm = () => {
+	const formRef = useRef<HTMLFormElement>(null);
+	const [state, formAction] = useActionState(createUserAction, undefined);
+	const emailError = state?.error.email?.[0];
+
 	const form = useForm<RegisterSchema>({
 		resolver: zodResolver(REGISTER_SCHEMA),
 		defaultValues: {
@@ -19,27 +24,25 @@ const RegisterForm = () => {
 			confirmPassword: "",
 			phoneNumber: "",
 			agreeTerm: false,
+			...state?.fields,
 		},
 	});
 
-	const onSubmit = async (data: RegisterSchema) => {
-		const formData = new FormData();
-		Object.entries(data).forEach(([key, value]) => {
-			if (key === "confirmPassword" || key === "agreeTerm") return;
-			if (typeof value === "boolean") {
-				formData.append(key, value ? "1" : "0");
-				return;
-			}
-			formData.append(key, value.toString());
-		});
-
-		const res = await createUserAction(formData);
-		console.log(res);
-	};
-
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+			<form
+				ref={formRef}
+				action={formAction}
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit(() => {
+						startTransition(() => {
+							formAction(new FormData(formRef.current!));
+						});
+					})(e);
+				}}
+				className="space-y-4"
+			>
 				<FormField
 					control={form.control}
 					name="username"
@@ -54,7 +57,11 @@ const RegisterForm = () => {
 					control={form.control}
 					name="email"
 					render={({ field, fieldState }) => (
-						<AuthInput placeholder="hello@example.com" {...field} error={fieldState.error?.message}>
+						<AuthInput
+							placeholder="hello@example.com"
+							{...field}
+							error={fieldState.error?.message ?? emailError}
+						>
 							電子信箱
 						</AuthInput>
 					)}

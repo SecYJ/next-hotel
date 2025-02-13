@@ -2,7 +2,7 @@ import ROUTES from "@/constants/routes";
 import Link from "next/link";
 import RegisterForm from "./_form";
 
-export default function RegisterPage() {
+const RegisterPage = () => {
 	return (
 		<div className="space-y-4">
 			<RegisterForm />
@@ -14,4 +14,6 @@ export default function RegisterPage() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default RegisterPage;
