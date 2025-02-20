@@ -1,7 +1,15 @@
-import { ReactNode } from "react";
+import { ComponentProps, ReactNode } from "react";
 
-const WhiteCard = ({ children }: { children: ReactNode }) => {
-    return <div className="rounded-lg bg-white p-6">{children}</div>;
+type Props = ComponentProps<"div"> & {
+    children: ReactNode;
+};
+
+const WhiteCard = ({ children, ...props }: Props) => {
+    return (
+        <div className="rounded-lg bg-white p-6" {...props}>
+            {children}
+        </div>
+    );
 };
 
 export default WhiteCard;
