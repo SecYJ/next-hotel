@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { ComponentProps, ReactNode } from "react";
 
 type Props = ComponentProps<"div"> & {
@@ -6,7 +7,7 @@ type Props = ComponentProps<"div"> & {
 
 const WhiteCard = ({ children, ...props }: Props) => {
     return (
-        <div className="rounded-lg bg-white p-6" {...props}>
+        <div {...props} className={cn("rounded-lg bg-white p-6", props.className)}>
             {children}
         </div>
     );
